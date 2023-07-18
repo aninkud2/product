@@ -115,48 +115,6 @@ exports.signIn = async (req, res)=>{
     }
 }
 
-// exports.changePassword = async(req,res)=>{
-//     try{
-//         const {password}= req.body
-//        const userId = req.params.userId
-//        const userPassword = await userModel.findById(userId)
-//        const salt = bcryptjs.genSaltSync(10)
-//        const hash = bcryptjs.hashSync(password, salt)
-//        await userModel.findByIdAndUpdate(userPassword,{password:hash},{new:true})
-//        res.status(201).json({
-//         message: "sucessfully changed password"
-//        })
-//     }catch(e){
-//         res.status(400).json({
-//             message:e.message
-//         }) 
-//     }
-// };
-
-// exports.resetpassword = async (req, res) => {
-//     try{
-//         const {email} = req.body
-//         const userEmail = await userModel .findOne({email})
-//         if(!userEmail) return  res.status(404).json({ message: "No Email" })
-
-//         const VerifyLink = `${req.protocol}://${req.get("host")}/api/changepassword/${userEmail._id}`
-//         const message = `Use this link ${userEmail.username} to reset your password.This link expires in 5 minutes ${VerifyLink}`;
-//         emailSender({
-//           from:process.env.USER,
-//           email: userEmail.email,
-//           subject: "Reset Pasword",
-//           message,
-//         })
-        
-//         res.status(201).json({
-//             message:"email have been sent"
-//         })
-//     }catch(err){
-//         res.status(400).json({
-//             message:err.message
-//         })
-//     }
-// };
 
 exports.changepassword = async (req, res)=>{
     try {
@@ -223,4 +181,3 @@ exports.forgotPassword = async(req, res)=>{
     }
 }
 
-// exports.reset
