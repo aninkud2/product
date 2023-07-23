@@ -4,9 +4,9 @@ const route = require("./Routers/userRouter")
 const app =express()
 
 app.use(express.json())
-app.use('/api', route)
-app.get("/",(req,res)=>{
-    res.send("welcome message")
+app.use( route)
+app.get("/",(req,res)=>{ 
+    res.send("welcome  to my page ")
 })
 
 module.exports = app

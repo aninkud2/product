@@ -18,23 +18,23 @@ exports.newUser = async (req, res)=>{
             email,
             password:hash,
         }
-        const createUser = new userModel(data)
+        const createUser = await new userModel(data)
 
         //generate a token
         const newToken = jwt.sign({
             username,
             password
-        }, process.env.JWT_TOKEN,{expiresIn: "1d"})
+        }, process.env.JWT_TOKEN,{expiresIn: 12}) 
         createUser.token = newToken
 
         const VerifyRoute = `${req.protocol}://${req.get("host")}/api/verifyUser/${createUser._id}`;
-        const message = `thanks for signing up as an Admin ${createUser.username} Kindly use the link to verify your account  ${VerifyRoute}`;
+        const message = `thanks for signing up as an Admin ${createUser.username} Kindly use the link to verify your account  ${VerifyRoute}/${createUser.token}  Kindly note that this link will expire in #0 mins`;
         emailSender({
             from:process.env.USER,
             email: createUser.email,
             subject: "Verify your Account",
             message,
-        });
+        }); 
 
         await createUser.save()
         if(!createUser){
@@ -50,10 +50,8 @@ exports.newUser = async (req, res)=>{
             })
         }
     } catch (error) {
-        res.status(500).json({
-            status: "Failed.",
-            message: error.message
-        })
+       res.json(error.message)
+        
     }
 }
 
@@ -92,11 +90,11 @@ exports.signIn = async (req, res)=>{
         const check = await userModel.findOne({username:username})
         if(!check){res.status(400).json({message:"wrong username."})}
 
-        const isPassword = await bcryptjs.compare(password, check.password)
-        if(!isPassword) { return res.status(400).json({message:"wrong password format"})}
-
-        //generate login token
-        const createToken = jwt.sign({
+       const isPassword = await bcryptjs.compare(password, check.password)
+         if(!isPassword) { return res.status(400).json({message:"wrong password format"})}
+       
+        //generate login token  
+       else{ const createToken = jwt.sign({
             username,
             password
         }, process.env.JWT_TOKEN,{expiresIn: "1d"})
@@ -106,13 +104,12 @@ exports.signIn = async (req, res)=>{
             status: "sucessful.",
             message: "loged in sucessful.",
             data:check
-        })
+        })}
     } catch (error) {
-        res.status(500).json({
-            status: "Failed.",
+        
             message: error.message
-        })
-    }
+        }
+    
 }
 
 
@@ -181,3 +178,21 @@ exports.forgotPassword = async(req, res)=>{
     }
 }
 
+//make admin
+exports.CreateAdmin=async(req,res)=>{
+    try {
+        const id=req.params.id
+        const makeadmin=await userModel.findByIdAndUpdate(id,{
+            isAdmin:true
+        })
+        if(!makeadmin){
+            res.json(`unable to make ${makeadmin.username} an admin`)
+        }
+        else{
+            res.json(`${makeadmin.username} has been made an admin`)
+        }
+        
+    } catch (error) { 
+        res.status(400).json(error.message)
+    }
+}  
